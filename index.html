@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Track what you do and how it makes you feel, so you can do more of what makes life better.">
+<meta name="theme-color" content="#2F6447">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mood Moves">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Mood Moves</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+html{color-scheme:light}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: one narrow column, phone-first; sticky tab bar at the bottom like a field notebook's tabs */
+:root{
+  --bg:#EDF1EC; --surface:#F8FAF6; --ink:#17251E; --muted:#56665D; --line:#CCD6CD;
+  --moss:#2F6447; --moss-ink:#FFFFFF; --lichen:#E1E9C9; --up:#2F7A4F; --down:#A4553A; --flat:#7C8A82;
+  --a-connect:#3D6E8F; --a-body:#2F7A4F; --a-achieve:#8A6A1F; --a-enjoy:#9A4F72; --a-routine:#5E6B64;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101814; --surface:#18231D; --ink:#E4ECE5; --muted:#9DAEA3; --line:#2C3B32;
+  --moss:#7CC39A; --moss-ink:#0E1A13; --lichen:#26341F; --up:#7CC39A; --down:#E09A7E; --flat:#8E9C94;
+  --a-connect:#86B6D6; --a-body:#7CC39A; --a-achieve:#D9B866; --a-enjoy:#D99BBB; --a-routine:#A9B5AE;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101814; --surface:#18231D; --ink:#E4ECE5; --muted:#9DAEA3; --line:#2C3B32;
+  --moss:#7CC39A; --moss-ink:#0E1A13; --lichen:#26341F; --up:#7CC39A; --down:#E09A7E; --flat:#8E9C94;
+  --a-connect:#86B6D6; --a-body:#7CC39A; --a-achieve:#D9B866; --a-enjoy:#D99BBB; --a-routine:#A9B5AE;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:20px calc(84px + env(safe-area-inset-bottom, 0px))}
+.wrap{max-width:560px;margin:0 auto;display:grid;gap:20px}
+header{display:grid;gap:4px}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.1;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-size:21px;margin:0;text-wrap:balance}
+p{margin:0}
+.lede{color:var(--muted)}
+.banner{background:var(--lichen);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14px}
+section[hidden]{display:none!important}
+.panel{display:grid;gap:18px}
+.field{display:grid;gap:8px}
+.field > label, .field > .label{font-weight:700;font-size:15px}
+.hint{font-size:13px;color:var(--muted);font-weight:400}
+input[type=text],input[type=date],input[type=datetime-local],textarea{
+  width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;min-height:46px}
+textarea{min-height:80px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--moss);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 13px;cursor:pointer;min-height:38px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.scale{display:grid;grid-template-columns:repeat(11,1fr);gap:4px}
+.scale button{font:500 15px/1 var(--mono);min-height:44px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;cursor:pointer;padding:0}
+.scale button[aria-pressed="true"]{background:var(--moss);color:var(--moss-ink);border-color:var(--moss)}
+.scale-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:460px){.pair{grid-template-columns:1fr}}
+.btn{font:700 16px var(--body);border:0;border-radius:12px;padding:13px 18px;min-height:50px;cursor:pointer;background:var(--moss);color:var(--moss-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.small{font-size:14px;min-height:38px;padding:8px 12px;border-radius:9px}
+.btn.danger{background:var(--down);color:var(--bg)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toast{font-size:14px;color:var(--moss);font-weight:700;min-height:1.5em}
+.list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+.item-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.item-title{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.meta{font-size:13px;color:var(--muted)}
+.tag{font-size:12px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap}
+.delta{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.delta.up{color:var(--up)} .delta.down{color:var(--down)} .delta.flat{color:var(--flat)}
+.ex{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:280px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{display:grid;gap:2px}
+.stat b{font:500 24px var(--mono);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);font-style:italic}
+.tip{border-left:3px solid var(--moss);padding:4px 0 4px 12px;color:var(--ink)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  padding:8px max(12px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));z-index:5}
+nav .tabs{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+nav button{font:700 14px var(--body);background:transparent;color:var(--muted);border:0;border-radius:10px;min-height:48px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--lichen);color:var(--ink)}
+.confirm{background:var(--surface);border:1.5px solid var(--down);border-radius:12px;padding:12px;display:grid;gap:10px}
+@media (prefers-reduced-motion:no-preference){.btn,.chip,.scale button{transition:background .15s,color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Forest walk group · Behavioural activation</div>
+    <h1>Mood Moves</h1>
+    <p class="lede">Notice what you do, and how it changes how you feel. Everything you enter stays on this device only.</p>
+  </header>
+
+  <div class="banner" id="exBanner" hidden>
+    <span>You're seeing a few example entries so you can see how it works.</span>
+    <button class="btn small ghost" id="clearEx" type="button">Clear examples</button>
+  </div>
+
+  <!-- LOG -->
+  <section class="panel" id="tab-log">
+    <h2 id="logHeading">Log an activity</h2>
+    <form id="logForm" class="panel" novalidate>
+      <div class="field">
+        <label for="act">What did you do?</label>
+        <input type="text" id="act" placeholder="e.g. Forest walk, Rice Lake loop" autocomplete="off">
+        <div class="chips" id="quick"></div>
+      </div>
+      <div class="field">
+        <span class="label">What kind of activity was it?</span>
+        <div class="chips" id="areas"></div>
+      </div>
+      <div class="field">
+        <label for="when">When</label>
+        <input type="datetime-local" id="when">
+      </div>
+      <div class="field">
+        <span class="label">Mood before <span class="hint">0 = lowest, 10 = best</span></span>
+        <div class="scale" id="s-before"></div>
+      </div>
+      <div class="field">
+        <span class="label">Mood after</span>
+        <div class="scale" id="s-after"></div>
+      </div>
+      <div class="field">
+        <span class="label">Enjoyment <span class="hint">How much did you enjoy it?</span></span>
+        <div class="scale" id="s-pleasure"></div>
+      </div>
+      <div class="field">
+        <span class="label">Accomplishment <span class="hint">How much did it feel like an achievement, given how you felt?</span></span>
+        <div class="scale" id="s-mastery"></div>
+      </div>
+      <div class="field">
+        <label for="note">Anything you noticed? <span class="hint">optional</span></label>
+        <textarea id="note" placeholder="e.g. Hard to get out the door, but the cedar smell helped."></textarea>
+      </div>
+      <div class="row">
+        <button class="btn" type="submit">Save entry</button>
+        <span class="toast" id="logToast" role="status"></span>
+      </div>
+    </form>
+    <div class="field">
+      <h2>Recent</h2>
+      <ul class="list" id="recent"></ul>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="panel" id="tab-plan" hidden>
+    <h2>Plan a small step</h2>
+    <p class="tip">Action comes before motivation. Pick something small, put it on a day, and make the first step tiny.</p>
+    <form id="planForm" class="panel" novalidate>
+      <div class="field">
+        <label for="pAct">Activity</label>
+        <input type="text" id="pAct" placeholder="e.g. Walk to the end of the block" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="pStep">Smallest first step</label>
+        <input type="text" id="pStep" placeholder="e.g. Put shoes by the door tonight" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="pDay">Day</label>
+        <input type="date" id="pDay">
+      </div>
+      <div class="row">
+        <button class="btn" type="submit">Add to plan</button>
+        <span class="toast" id="planToast" role="status"></span>
+      </div>
+    </form>
+    <div class="field">
+      <h2>Coming up</h2>
+      <ul class="list" id="plans"></ul>
+    </div>
+  </section>
+
+  <!-- PATTERNS -->
+  <section class="panel" id="tab-patterns" hidden>
+    <h2>Patterns</h2>
+    <div class="stats" id="stats"></div>
+    <div class="field">
+      <span class="label">Mood before → after <span class="hint">last 14 entries</span></span>
+      <div class="chart" id="chart"></div>
+    </div>
+    <div class="field">
+      <span class="label">What lifts you <span class="hint">average change in mood</span></span>
+      <div style="overflow-x:auto"><table id="byAct"></table></div>
+    </div>
+    <div class="field">
+      <span class="label">By kind of activity</span>
+      <div style="overflow-x:auto"><table id="byArea"></table></div>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section class="panel" id="tab-data" hidden>
+    <h2>Your data</h2>
+    <p>Your entries are saved in this browser on this device. They are never sent anywhere, and the group facilitator can't see them.</p>
+    <p class="tip">Clearing your browser data or using a private window will erase them. To keep a backup or move to another device, copy your backup below and paste it somewhere safe (like a note to yourself).</p>
+    <div class="field">
+      <label for="backup">Backup</label>
+      <textarea id="backup" readonly rows="5" style="font-family:var(--mono);font-size:12px"></textarea>
+      <div class="row"><button class="btn small" id="copyBk" type="button">Copy backup</button><span class="toast" id="bkToast" role="status"></span></div>
+    </div>
+    <div class="field">
+      <label for="restore">Restore from a backup</label>
+      <textarea id="restore" rows="4" placeholder="Paste a backup here" style="font-family:var(--mono);font-size:12px"></textarea>
+      <div class="row"><button class="btn small ghost" id="doRestore" type="button">Restore</button><span class="toast" id="rsToast" role="status"></span></div>
+    </div>
+    <div class="field">
+      <span class="label">Start over</span>
+      <div class="row"><button class="btn small danger" id="askWipe" type="button">Delete everything</button></div>
+      <div class="confirm" id="wipeBox" hidden>
+        <p>This permanently deletes all your entries and plans on this device.</p>
+        <div class="row"><button class="btn small danger" id="doWipe" type="button">Yes, delete</button><button class="btn small ghost" id="noWipe" type="button">Keep my data</button></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav><div class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-tab="log" id="t-log">Log</button>
+  <button role="tab" aria-selected="false" data-tab="plan" id="t-plan">Plan</button>
+  <button role="tab" aria-selected="false" data-tab="patterns" id="t-patterns">Patterns</button>
+  <button role="tab" aria-selected="false" data-tab="data" id="t-data">My data</button>
+</div></nav>
+
+<script>
+(function(){
+const KEY='small-steps-v1';
+const AREAS=[
+  {id:'connect',label:'Connection',color:'--a-connect'},
+  {id:'body',label:'Body & outdoors',color:'--a-body'},
+  {id:'achieve',label:'Getting things done',color:'--a-achieve'},
+  {id:'enjoy',label:'Enjoyment',color:'--a-enjoy'},
+  {id:'routine',label:'Daily routine',color:'--a-routine'}
+];
+const QUICK=['Forest walk','Called or texted someone','Cooked a meal','Tidied one area','Got outside','Creative time','Showered & dressed'];
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const pad=n=>String(n).padStart(2,'0');
+const localDT=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const localD=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function examples(){
+  const now=new Date(), d=(days,h)=>{const x=new Date(now);x.setDate(x.getDate()-days);x.setHours(h,0,0,0);return x.toISOString();};
+  return {entries:[
+    {id:uid(),ts:d(6,10),activity:'Forest walk',area:'body',before:3,after:6,pleasure:6,mastery:7,note:'Nearly cancelled. Glad I went.',example:true},
+    {id:uid(),ts:d(5,19),activity:'Scrolled phone in bed',area:'routine',before:4,after:3,pleasure:2,mastery:0,note:'',example:true},
+    {id:uid(),ts:d(4,12),activity:'Called or texted someone',area:'connect',before:4,after:6,pleasure:6,mastery:4,note:'Texted my sister.',example:true},
+    {id:uid(),ts:d(3,18),activity:'Cooked a meal',area:'achieve',before:3,after:5,pleasure:4,mastery:7,note:'',example:true},
+    {id:uid(),ts:d(2,9),activity:'Forest walk',area:'body',before:4,after:7,pleasure:7,mastery:6,note:'Rain stopped halfway.',example:true},
+    {id:uid(),ts:d(1,15),activity:'Tidied one area',area:'achieve',before:5,after:6,pleasure:3,mastery:6,note:'Just the kitchen counter.',example:true}
+  ],plans:[
+    {id:uid(),day:localD(new Date(now.getTime()+86400000)),activity:'Forest walk with the group',step:'Lay out rain jacket tonight',done:false,example:true},
+    {id:uid(),day:localD(new Date(now.getTime()+3*86400000)),activity:'Coffee with a friend',step:'Send one text to suggest a time',done:false,example:true}
+  ]};
+}
+
+let state={entries:[],plans:[]};
+let storageOK=true;
+function load(){
+  try{const raw=localStorage.getItem(KEY); if(raw){const s=JSON.parse(raw); state={entries:s.entries||[],plans:s.plans||[]}; return;}}
+  catch(e){storageOK=false;}
+  state=examples();
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true;}catch(e){storageOK=false;}}
+
+/* scales */
+const vals={before:null,after:null,pleasure:null,mastery:null};
+function buildScale(name){
+  const el=$('s-'+name); el.innerHTML='';
+  for(let i=0;i<=10;i++){const b=document.createElement('button');b.type='button';b.textContent=i;b.id=`s-${name}-${i}`;
+    b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',`${name} ${i}`);
+    b.onclick=()=>{vals[name]=i;[...el.children].forEach((c,j)=>c.setAttribute('aria-pressed',String(j===i)));};el.appendChild(b);}
+}
+['before','after','pleasure','mastery'].forEach(buildScale);
+function setScale(name,v){vals[name]=v;[...$('s-'+name).children].forEach((c,j)=>c.setAttribute('aria-pressed',String(j===v)));}
+
+let area=null, pendingPlan=null;
+function buildAreas(){
+  $('areas').innerHTML=AREAS.map(a=>`<button type="button" class="chip" id="area-${a.id}" data-area="${a.id}" aria-pressed="${area===a.id}">${a.label}</button>`).join('');
+  $('areas').querySelectorAll('button').forEach(b=>b.onclick=()=>{area=area===b.dataset.area?null:b.dataset.area;buildAreas();});
+}
+$('quick').innerHTML=QUICK.map((q,i)=>`<button type="button" class="chip" id="q-${i}">${q}</button>`).join('');
+$('quick').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('act').value=b.textContent;if(b.textContent==='Forest walk'&&!area){area='body';buildAreas();}});
+
+function resetLog(){
+  $('act').value='';$('note').value='';$('when').value=localDT(new Date());area=null;buildAreas();
+  ['before','after','pleasure','mastery'].forEach(n=>setScale(n,null));pendingPlan=null;$('logHeading').textContent='Log an activity';
+}
+$('logForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const activity=$('act').value.trim();
+  if(!activity){flash('logToast','Add what you did first.');$('act').focus();return;}
+  if(vals.before===null||vals.after===null){flash('logToast','Pick a mood before and after.');return;}
+  const ts=$('when').value?new Date($('when').value).toISOString():new Date().toISOString();
+  state.entries.push({id:uid(),ts,activity,area,before:vals.before,after:vals.after,pleasure:vals.pleasure,mastery:vals.mastery,note:$('note').value.trim()});
+  if(pendingPlan){const p=state.plans.find(x=>x.id===pendingPlan);if(p)p.done=true;}
+  save();resetLog();render();
+  flash('logToast',storageOK?'Saved on this device.':'Saved for now, but this browser won’t keep it after you close the page.');
+});
+
+function flash(id,msg){const el=$(id);el.textContent=msg;clearTimeout(el._t);el._t=setTimeout(()=>el.textContent='',4000);}
+const areaOf=id=>AREAS.find(a=>a.id===id);
+const fmt=ts=>new Date(ts).toLocaleString(undefined,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+const deltaHTML=d=>{const c=d>0?'up':d<0?'down':'flat';return `<span class="delta ${c}">${d>0?'+':''}${d}</span>`;};
+
+function renderRecent(){
+  const list=[...state.entries].sort((a,b)=>b.ts.localeCompare(a.ts)).slice(0,6);
+  $('recent').innerHTML=list.length?list.map(e=>{const a=areaOf(e.area);
+    return `<li class="item"><div class="item-top"><span class="item-title">${esc(e.activity)}</span>${deltaHTML(e.after-e.before)}</div>
+    <div class="row meta">${fmt(e.ts)} · mood ${e.before} → ${e.after}${a?` <span class="tag" style="color:var(${a.color})">${a.label}</span>`:''}${e.example?' <span class="ex">Example</span>':''}</div>
+    ${e.note?`<div class="meta">${esc(e.note)}</div>`:''}</li>`;}).join(''):'<li class="empty">Nothing logged yet. Your first entry will show up here.</li>';
+}
+
+$('pDay').value=localD(new Date());
+$('planForm').addEventListener('submit',e=>{
+  e.preventDefault();const a=$('pAct').value.trim();if(!a){flash('planToast','Add an activity first.');return;}
+  state.plans.push({id:uid(),day:$('pDay').value||localD(new Date()),activity:a,step:$('pStep').value.trim(),done:false});
+  save();$('pAct').value='';$('pStep').value='';render();flash('planToast','Added to your plan.');
+});
+function renderPlans(){
+  const today=localD(new Date());
+  const list=[...state.plans].sort((a,b)=>(a.done-b.done)||a.day.localeCompare(b.day));
+  $('plans').innerHTML=list.length?list.map(p=>{
+    const d=new Date(p.day+'T12:00');const label=p.day===today?'Today':d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+    const status=p.done?'<span class="tag" style="color:var(--up)">Done</span>':(p.day<today?'<span class="tag" style="color:var(--down)">Missed? Reschedule</span>':'');
+    return `<li class="item"><div class="item-top"><span class="item-title">${esc(p.activity)}</span><span class="meta">${label}</span></div>
+    ${p.step?`<div class="meta">First step: ${esc(p.step)}</div>`:''}
+    <div class="row">${status}${p.example?'<span class="ex">Example</span>':''}
+    ${p.done?'':`<button type="button" class="btn small" data-did="${p.id}">I did it → log it</button>`}
+    <button type="button" class="btn small ghost" data-del="${p.id}">Remove</button></div></li>`;}).join(''):'<li class="empty">No plans yet. Add one small step above.</li>';
+  $('plans').querySelectorAll('[data-did]').forEach(b=>b.onclick=()=>{
+    const p=state.plans.find(x=>x.id===b.dataset.did);resetLog();$('act').value=p.activity;pendingPlan=p.id;
+    $('logHeading').textContent='Log: '+p.activity;showTab('log');$('s-before-0').focus();});
+  $('plans').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.plans=state.plans.filter(x=>x.id!==b.dataset.del);save();render();});
+}
+
+function avg(a){return a.length?a.reduce((s,x)=>s+x,0)/a.length:0;}
+const f1=n=>(n>0?'+':'')+n.toFixed(1);
+function renderPatterns(){
+  const E=[...state.entries].sort((a,b)=>a.ts.localeCompare(b.ts));
+  const deltas=E.map(e=>e.after-e.before);
+  const weekAgo=Date.now()-7*86400000;
+  $('stats').innerHTML=`
+    <div class="stat"><b>${E.length}</b><span>activities logged</span></div>
+    <div class="stat"><b>${E.filter(e=>new Date(e.ts).getTime()>=weekAgo).length}</b><span>in the last 7 days</span></div>
+    <div class="stat"><b>${E.length?f1(avg(deltas)):'–'}</b><span>average mood change</span></div>`;
+  // chart
+  const L=E.slice(-14);
+  if(!L.length){$('chart').innerHTML='<p class="empty">Log a few activities to see your pattern.</p>';}
+  else{
+    const W=320,H=170,ml=26,mr=8,mt=10,mb=26,iw=W-ml-mr,ih=H-mt-mb;
+    const y=v=>mt+ih-(v/10)*ih;const step=iw/Math.max(L.length,1);const x=i=>ml+step*i+step/2;
+    let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mood before and after each of the last ${L.length} activities">`;
+    [0,5,10].forEach(v=>{s+=`<line x1="${ml}" x2="${W-mr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${ml-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${v}</text>`;});
+    L.forEach((e,i)=>{const c=e.after>e.before?'var(--up)':e.after<e.before?'var(--down)':'var(--flat)';
+      s+=`<line x1="${x(i)}" x2="${x(i)}" y1="${y(e.before)}" y2="${y(e.after)}" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
+      s+=`<circle cx="${x(i)}" cy="${y(e.before)}" r="3.5" fill="var(--surface)" stroke="${c}" stroke-width="2"/>`;
+      s+=`<circle cx="${x(i)}" cy="${y(e.after)}" r="4.5" fill="${c}"><title>${esc(e.activity)}: ${e.before} → ${e.after}</title></circle>`;
+      if(L.length<=8||i%2===0){const d=new Date(e.ts);s+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${d.getMonth()+1}/${d.getDate()}</text>`;}
+    });
+    s+='</svg><p class="meta" style="margin-top:6px">Hollow dot = before, filled dot = after.</p>';$('chart').innerHTML=s;
+  }
+  // by activity
+  const group=(keyFn)=>{const m={};E.forEach(e=>{const k=keyFn(e);if(!k)return;(m[k]=m[k]||[]).push(e);});return Object.entries(m).map(([k,v])=>({k,n:v.length,d:avg(v.map(e=>e.after-e.before)),p:avg(v.filter(e=>e.pleasure!=null).map(e=>e.pleasure)),m:avg(v.filter(e=>e.mastery!=null).map(e=>e.mastery))})).sort((a,b)=>b.d-a.d);};
+  const acts=group(e=>e.activity.trim().toLowerCase().replace(/^\w/,c=>c.toUpperCase()));
+  $('byAct').innerHTML=acts.length?`<tr><th>Activity</th><th class="num">Times</th><th class="num">Mood</th><th class="num">Enjoy</th><th class="num">Accompl.</th></tr>`+
+    acts.map(r=>`<tr><td>${esc(r.k)}</td><td class="num">${r.n}</td><td class="num">${deltaHTML(+r.d.toFixed(1)).replace(/>([+-]?[\d.]+)</,'>'+f1(r.d)+'<')}</td><td class="num">${r.p?r.p.toFixed(1):'–'}</td><td class="num">${r.m?r.m.toFixed(1):'–'}</td></tr>`).join(''):'<tr><td class="empty">No entries yet.</td></tr>';
+  const ar=group(e=>e.area);
+  $('byArea').innerHTML=ar.length?`<tr><th>Kind</th><th class="num">Times</th><th class="num">Mood</th></tr>`+
+    ar.map(r=>{const a=areaOf(r.k);return `<tr><td><span class="tag" style="color:var(${a.color})">${a.label}</span></td><td class="num">${r.n}</td><td class="num">${deltaHTML(+r.d.toFixed(1)).replace(/>([+-]?[\d.]+)</,'>'+f1(r.d)+'<')}</td></tr>`;}).join(''):'<tr><td class="empty">Tag activities with a kind to see this.</td></tr>';
+}
+
+function renderData(){$('backup').value=JSON.stringify({app:'small-steps',v:1,entries:state.entries.filter(e=>!e.example),plans:state.plans.filter(p=>!p.example)});}
+$('copyBk').onclick=()=>{const t=$('backup');navigator.clipboard&&navigator.clipboard.writeText(t.value).then(()=>flash('bkToast','Copied.'),()=>{t.select();flash('bkToast','Selected. Copy it with your keyboard or long-press.');})||(t.select(),flash('bkToast','Selected. Copy it with your keyboard or long-press.'));};
+$('doRestore').onclick=()=>{try{const s=JSON.parse($('restore').value);if(!Array.isArray(s.entries))throw 0;
+  state={entries:s.entries,plans:s.plans||[]};save();$('restore').value='';render();flash('rsToast',`Restored ${s.entries.length} entries.`);}
+  catch(e){flash('rsToast','That doesn’t look like a backup from this tracker. Paste the whole backup text and try again.');}};
+$('askWipe').onclick=()=>{$('wipeBox').hidden=false;};
+$('noWipe').onclick=()=>{$('wipeBox').hidden=true;};
+$('doWipe').onclick=()=>{state={entries:[],plans:[]};save();$('wipeBox').hidden=true;render();};
+$('clearEx').onclick=()=>{state.entries=state.entries.filter(e=>!e.example);state.plans=state.plans.filter(p=>!p.example);save();render();};
+
+function showTab(t){['log','plan','patterns','data'].forEach(n=>{$('tab-'+n).hidden=n!==t;$('t-'+n).setAttribute('aria-selected',String(n===t));});
+  try{sessionStorage.setItem(KEY+'-tab',t);}catch(e){} window.scrollTo(0,0);}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+function render(){
+  $('exBanner').hidden=!(state.entries.some(e=>e.example)||state.plans.some(p=>p.example));
+  renderRecent();renderPlans();renderPatterns();renderData();
+}
+load();resetLog();render();
+try{const t=sessionStorage.getItem(KEY+'-tab');if(t)showTab(t);}catch(e){}
+})();
+</script>
+</body>
+</html>
